@@ -10,24 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ActivityNavigation">
         <activity
-            android:name=".BoxActivity"
-            android:exported="false" />
-        <activity
-            android:name=".OptionsActivity"
-            android:exported="false"
-            android:label="@string/options"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".OpenBoxActivity"
-            android:exported="false"
-            android:label="@string/open_box"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".AboutActivity"
-            android:exported="false"
-            android:label="@string/about_bt"
-            android:parentActivityName=".MainActivity" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

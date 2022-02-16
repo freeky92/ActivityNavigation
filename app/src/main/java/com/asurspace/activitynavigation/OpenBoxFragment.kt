@@ -4,8 +4,13 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.LayoutInflater
 import android.view.View
-import com.asurspace.activitynavigation.databinding.ActivityOpenBoxBinding
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.asurspace.activitynavigation.contract.HasCustomTitle
+import com.asurspace.activitynavigation.contract.navigator
+import com.asurspace.activitynavigation.databinding.FragmentOpenBoxBinding
 import com.asurspace.activitynavigation.databinding.ItemBoxBinding
 import com.asurspace.activitynavigation.model.Options
 import com.google.android.material.snackbar.Snackbar
@@ -13,9 +18,10 @@ import kotlin.math.max
 import kotlin.properties.Delegates
 import kotlin.random.Random
 
-class OpenBoxActivity : BaseActivityCompat() {
+class OpenBoxFragment : Fragment(), HasCustomTitle {
 
-    private lateinit var binding: ActivityOpenBoxBinding
+    private var _binding: FragmentOpenBoxBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var options: Options
 
@@ -26,11 +32,17 @@ class OpenBoxActivity : BaseActivityCompat() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityOpenBoxBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        options = intent.getParcelableExtra(EXTRA_OPTIONS)
-            ?: throw  IllegalArgumentException("Can't launch OpenBoxActivity without option.")
+        options = arguments?.getParcelable(ARG_OPTIONS)
+            ?: throw  IllegalArgumentException("Can't launch OpenBoxFragment without option.")
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentOpenBoxBinding.inflate(inflater, container, false)
 
         boxIndex = savedInstanceState?.getInt(KEY_INDEX) ?: Random.nextInt(options.boxCount)
 
@@ -42,6 +54,8 @@ class OpenBoxActivity : BaseActivityCompat() {
         }
 
         createBoxes()
+
+        return binding.root
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -70,7 +84,8 @@ class OpenBoxActivity : BaseActivityCompat() {
         val boxBindings = (0 until options.boxCount).map { index ->
             val boxBinding = ItemBoxBinding.inflate(layoutInflater)
             boxBinding.root.id = View.generateViewId()
-            boxBinding.boxTitleTextView.text = "Box #${index + 1}"
+            boxBinding.boxTitleTextView.text =
+                getString(R.string.box_title, index + 1)
             boxBinding.root.setOnClickListener { view ->
                 onBoxSelected(view)
             }
@@ -84,8 +99,7 @@ class OpenBoxActivity : BaseActivityCompat() {
 
     private fun onBoxSelected(view: View) {
         if (view.tag as Int == boxIndex) {
-            val intent = Intent(this, BoxActivity::class.java)
-            startActivity(intent)
+           navigator().showCongratulationScreen()
         } else {
             Snackbar.make(
                 binding.root,
@@ -111,19 +125,20 @@ class OpenBoxActivity : BaseActivityCompat() {
     private fun updateTimerUi() {
         if (getRemainingSeconds() >= 0) {
             binding.timeTextView.visibility = View.VISIBLE
-            binding.timeTextView.text = "Timer: ${getRemainingSeconds()} sec."
+            binding.timeTextView.text = getString(R.string.timer_text, getRemainingSeconds())
         } else {
             binding.timeTextView.visibility = View.GONE
         }
     }
 
     private fun showTimerEndDialog() {
-        val dialog = AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.the_end))
             .setMessage(getString(R.string.oops))
             .setCancelable(false)
             .setPositiveButton("Ok") { _, _ ->
-                finish()
+                requireActivity().onBackPressed()
+                //finish()
             }
             .create()
         dialog.show()
@@ -134,10 +149,18 @@ class OpenBoxActivity : BaseActivityCompat() {
         return max(0L, (finishedAt - System.currentTimeMillis()) / 1000)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
 
         @JvmStatic
-        val EXTRA_OPTIONS = "EXTRA_OPTIONS"
+        private val ARG_OPTIONS = "ARG_OPTIONS"
+
+        @JvmStatic
+        private val KEY_RESULT = "KEY_RESULT"
 
         @JvmStatic
         private val KEY_INDEX = "KEY_INDEX"
@@ -148,5 +171,14 @@ class OpenBoxActivity : BaseActivityCompat() {
         @JvmStatic
         private val TIMER_DURATION = 10_000L
 
+        @JvmStatic
+        fun newInstance(options: Options) = OpenBoxFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(ARG_OPTIONS, options)
+            }
+        }
+
     }
+
+    override fun getTitleRes() = R.string.open_box
 }

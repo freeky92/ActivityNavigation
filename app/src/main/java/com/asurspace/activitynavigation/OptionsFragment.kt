@@ -1,55 +1,65 @@
 package com.asurspace.activitynavigation
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import com.asurspace.activitynavigation.databinding.ActivityOptionsBinding
+import androidx.fragment.app.Fragment
+import com.asurspace.activitynavigation.contract.CustomAction
+import com.asurspace.activitynavigation.contract.HasCustomAction
+import com.asurspace.activitynavigation.contract.HasCustomTitle
+import com.asurspace.activitynavigation.contract.navigator
+import com.asurspace.activitynavigation.databinding.FragmentOptionsBinding
 import com.asurspace.activitynavigation.model.Options
 
-class OptionsActivity : BaseActivityCompat() {
+class OptionsFragment : Fragment(), HasCustomTitle, HasCustomAction {
 
-    private lateinit var binding: ActivityOptionsBinding
+    private var _binding: FragmentOptionsBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var options: Options
-    private lateinit var newOptions: Options
-
     private lateinit var spinnerAdapter: ArrayAdapter<BoxCountItem>
     private lateinit var boxCountItems: List<BoxCountItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityOptionsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         options = savedInstanceState?.getParcelable(KEY_OPTIONS)
-            ?: intent.getParcelableExtra(EXTRA_OPTIONS)
-                    ?: throw IllegalArgumentException("You need to specify EXTRA_OPTIONS argument to launch this activity")
+            ?: arguments?.getParcelable(ARG_OPTIONS)
+                    ?: throw IllegalArgumentException("You need to specify ARG_OPTIONS argument to launch this fragment")
+    }
 
-        newOptions = options
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentOptionsBinding.inflate(inflater, container, false)
 
         setUpSpinner()
         setUpCheckBox()
         updateUi()
 
         with(binding) {
-            cancelTb.setOnClickListener { finish() }
+            cancelTb.setOnClickListener { onCancelPressed() }
             confermTb.setOnClickListener { onConfirmPressed() }
         }
+
+        return binding.root
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(EXTRA_OPTIONS, options)
+        outState.putParcelable(ARG_OPTIONS, options)
     }
 
     private fun setUpSpinner() {
         boxCountItems = (2..6).map { BoxCountItem(it, "$it boxes") }
 
         spinnerAdapter = ArrayAdapter(
-            this,
+            requireContext(),
             R.layout.spinner_adapter_item,
             boxCountItems
         )
@@ -64,7 +74,7 @@ class OptionsActivity : BaseActivityCompat() {
                 id: Long
             ) {
                 val count = boxCountItems[position].count
-                newOptions = options.copy(boxCount = count)
+                options = options.copy(boxCount = count)
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
@@ -73,7 +83,7 @@ class OptionsActivity : BaseActivityCompat() {
 
     private fun setUpCheckBox() {
         binding.checkB.setOnCheckedChangeListener { _, b ->
-            newOptions = newOptions.copy(isTimerEnable = b)
+            options = options.copy(isTimerEnable = b)
         }
     }
 
@@ -85,26 +95,41 @@ class OptionsActivity : BaseActivityCompat() {
     }
 
     private fun onConfirmPressed() {
-        val i = Intent()
-        i.putExtra(EXTRA_OPTIONS, newOptions)
-        setResult(Activity.RESULT_OK, i)
-        finish()
+        navigator().provideResult(options)
+        navigator().goBack()
     }
 
-    override fun onBackPressed() {
-        val i = Intent()
-        i.putExtra(EXTRA_OPTIONS, options)
-        setResult(Activity.RESULT_OK, i)
-        finish()
+    private fun onCancelPressed() {
+        navigator().goBack()
     }
+
+    override fun getCustomAction() = CustomAction(
+        iconRes = R.drawable.ic_check_circle_24,
+        textRes = R.string.confirm,
+        onCustomAction = {
+            navigator().run {
+                provideResult(options)
+                goBack()
+            }
+        }
+    )
+
+    override fun getTitleRes(): Int = R.string.options
 
     companion object {
 
         @JvmStatic
-        val EXTRA_OPTIONS = "EXTRA_OPTIONS"
+        private val ARG_OPTIONS = "ARG_OPTIONS"
 
         @JvmStatic
         private val KEY_OPTIONS = "KEY_OPTIONS"
+
+        @JvmStatic
+        fun newInstance(options: Options) = OptionsFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(ARG_OPTIONS, options)
+            }
+        }
 
     }
 
@@ -116,4 +141,10 @@ class OptionsActivity : BaseActivityCompat() {
             return optionTitle
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }

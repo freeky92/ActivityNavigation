@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OptionsActivity">
+    tools:context=".OptionsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/eternal_constraint"
+
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:background="@drawable/background_white_radius"
+        android:background="@drawable/background_blue_radius"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,6 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:contentDescription="@string/choose_count"
             android:text="@string/set_the_number_of_boxes"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title" />
@@ -39,7 +41,7 @@
         <Spinner
             android:id="@+id/spinner"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/text_set"
@@ -61,21 +63,20 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/cancel_tb"
-        style="@style/Widget.AppCompat.Button.Colored"
+        style="@style/ButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:text="@string/cancel"
-        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/conferm_tb"
         app:layout_constraintStart_toStartOf="@id/eternal_constraint"
         app:layout_constraintTop_toBottomOf="@id/eternal_constraint" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/conferm_tb"
-        style="@style/Widget.AppCompat.Button.Colored"
+        style="@style/ButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
