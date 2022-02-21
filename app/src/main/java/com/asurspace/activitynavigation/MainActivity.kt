@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity(), Navigator {
     ) {
         supportFragmentManager.setFragmentResultListener(
             clazz.name,
-            owner // todo need to focus
+            owner // viewModelOwner from fragment
         ) { _, bundle -> listener.invoke(bundle.getParcelable(KEY_RESULT)!!) } // FragmentResultListener arguments
     }
 

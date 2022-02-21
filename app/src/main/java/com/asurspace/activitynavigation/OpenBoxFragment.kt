@@ -138,7 +138,6 @@ class OpenBoxFragment : Fragment(), HasCustomTitle {
             .setCancelable(false)
             .setPositiveButton("Ok") { _, _ ->
                 requireActivity().onBackPressed()
-                //finish()
             }
             .create()
         dialog.show()
