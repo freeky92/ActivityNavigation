@@ -1,10 +1,11 @@
-package com.asurspace.activitynavigation
+package com.asurspace.activitynavigation.screens
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.asurspace.activitynavigation.R
 import com.asurspace.activitynavigation.contract.HasCustomTitle
 import com.asurspace.activitynavigation.contract.navigator
 import com.asurspace.activitynavigation.databinding.FragmentAboutBinding
@@ -22,8 +23,15 @@ class AboutFragment : Fragment(), HasCustomTitle {
         _binding = FragmentAboutBinding.inflate(inflater, container, false)
 
         with(binding) {
-            versionNameField.text = BuildConfig.VERSION_NAME
-            versionCodeField.text = BuildConfig.VERSION_CODE.toString()
+            versionNameField.text = requireContext().packageManager.getPackageInfo(
+                requireContext().packageName,
+                0
+            ).versionName
+
+            versionCodeField.text = requireContext().packageManager.getPackageInfo(
+                requireContext().packageName,
+                0
+            ).versionCode.toString()
             okTb.setOnClickListener { navigator().goBack() }
         }
 

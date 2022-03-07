@@ -1,4 +1,4 @@
-package com.asurspace.activitynavigation
+package com.asurspace.activitynavigation.screens
 
 import android.os.Bundle
 import android.view.LayoutInflater

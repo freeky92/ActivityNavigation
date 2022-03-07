@@ -1,4 +1,4 @@
-package com.asurspace.activitynavigation
+package com.asurspace.activitynavigation.screens
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import com.asurspace.activitynavigation.R
 import com.asurspace.activitynavigation.contract.CustomAction
 import com.asurspace.activitynavigation.contract.HasCustomAction
 import com.asurspace.activitynavigation.contract.HasCustomTitle

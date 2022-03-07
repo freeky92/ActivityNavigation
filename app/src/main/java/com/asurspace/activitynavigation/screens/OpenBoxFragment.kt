@@ -1,13 +1,13 @@
-package com.asurspace.activitynavigation
+package com.asurspace.activitynavigation.screens
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.asurspace.activitynavigation.R
 import com.asurspace.activitynavigation.contract.HasCustomTitle
 import com.asurspace.activitynavigation.contract.navigator
 import com.asurspace.activitynavigation.databinding.FragmentOpenBoxBinding
